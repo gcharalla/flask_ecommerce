@@ -1,5 +1,6 @@
 from market import db
 from market import app
+from market import bcrypt
 
 
 class User (db.Model):
@@ -11,6 +12,13 @@ class User (db.Model):
     budget = db.Column(db.Integer(), nullable=False, default=1000)
     items = db.relationship('Item', backref='owned_user', lazy=True)
 
+    @property
+    def password(self):
+        return self.password
+
+    @password.setter
+    def password(self, plain_text_password):
+        self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
 
 class Item(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -21,8 +29,13 @@ class Item(db.Model):
     owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
 
 
-""" with app.app_context():
+"""  with app.app_context():
     db.create_all()
+
+ """
+
+
+"""   
     u1 = User(username='jsc', email_address='jsc@jsc', password_hash='123456')
     i1 = Item(title="MONITOR 25 ASUS ROG SWIFT PG259QNR FHD 360Hz", stock=10, price=650.00,
               img="https://cdn.memorykings.pe/files/2021/06/08/329196-MK029536A.jpg", owner=1)
@@ -32,4 +45,4 @@ class Item(db.Model):
     db.session.add(i1)
     db.session.add(i2)
     db.session.commit()
- """
+"""
